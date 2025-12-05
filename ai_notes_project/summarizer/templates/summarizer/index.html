@@ -1,0 +1,90 @@
+{% extends 'summarizer/base.html' %}
+
+{% block title %}AI Notes Summarizer | Home{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8 mb-4">
+        <div class="card card-shadow">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Create Summary</h5>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+
+                    <label class="form-label">Title</label>
+                    {{ form.title }}
+                    <div class="form-text">Leave empty to auto-generate title.</div>
+
+                    <label class="form-label mt-3">Your Notes / Text</label>
+                    {{ form.original_text }}
+
+                    <!-- Summary Mode Selector -->
+                    <label class="form-label mt-3">Summary Mode</label>
+                    <select name="mode" class="form-select">
+                        <option value="short">Short Summary</option>
+                        <option value="medium" selected>Medium Summary</option>
+                        <option value="detailed">Detailed Summary</option>
+                    </select>
+
+                    <button type="submit" class="btn btn-primary mt-3 w-100">
+                        Generate Summary
+                    </button>
+                </form>
+
+                {% if summary %}
+                <div class="card card-shadow border-success mt-4">
+                    <div class="card-header bg-success text-white">
+                        <h6 class="mb-0">AI Generated Summary</h6>
+                    </div>
+                    <div class="card-body" style="white-space: pre-line;">
+                        {{ summary }}
+                    </div>
+                </div>
+
+                {% if keywords %}
+                <div class="card card-shadow mt-3">
+                    <div class="card-header bg-info text-white">
+                        <h6 class="mb-0">Top Keywords</h6>
+                    </div>
+                    <div class="card-body">
+                        <p>{{ keywords|join:", " }}</p>
+                    </div>
+                </div>
+                {% endif %}
+                {% endif %}
+
+
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4 mb-4">
+        <div class="card card-shadow">
+            <div class="card-header bg-light">
+                <h6 class="mb-0">Recent Summaries</h6>
+            </div>
+            <div class="card-body">
+                {% if recent_notes %}
+                <ul class="list-group list-group-flush">
+                    {% for note in recent_notes %}
+                    <li class="list-group-item">
+                        <a href="{% url 'note_detail' note.pk %}">
+                            {{ note.title }}
+                        </a>
+                        <br>
+                        <small class="text-muted">
+                            {{ note.created_at|date:"d M Y, H:i" }}
+                        </small>
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <p class="text-muted mb-0">No summaries yet. Create your first one!</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
